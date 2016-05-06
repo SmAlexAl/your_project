@@ -1,0 +1,8 @@
+; &Id:$
+name = JSON Module
+description = this is my first module for json
+version = 7.x-dev
+core = 7.x
+
+
+

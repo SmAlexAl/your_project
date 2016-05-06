@@ -1,0 +1,31 @@
+<?php
+error_reporting(E_ALL);
+
+ini_set('display_errors', 1);
+/**
+ * Implements hook_menu
+ */
+
+function primer_menu(){
+    $items = array();
+   $items['primer'] = array(
+        'title'                 => 'CURRENCY',
+        'page callback'         => 'my_first_primer',
+        'access callback'       => TRUE
+    );
+    return $items;
+}
+/**
+ * Implements my_first
+ */
+
+function my_first_primer(){
+    $str="string for information";
+    $number=100;
+    $number=$number+100;
+    dsm($str);
+
+}
+
+
+?>

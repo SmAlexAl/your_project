@@ -1,0 +1,27 @@
+<?php
+header("Content-Type: text/html; charset=utf-8");
+
+
+/**
+ * Implements hook_menu()
+ */
+function currency_json_menu(){
+    $items = array();
+    $items['json'] = array(
+        'title'                 =>'json',
+        'page callback'         => 'json',
+        'access callback'       => TRUE
+    );
+    return $items;
+}
+
+function json(){
+    $url='http://www.cbr.ru/scripts/XML_daily.asp';
+    $result = drupal_http_request($url);
+        $kurs= simplexml_load_string($result->data);
+        $json = json_encode($kurs);
+           print($json);
+   
+}
+
+?>

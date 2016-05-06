@@ -1,0 +1,8 @@
+; &Id:$
+name = My primer
+description = this is my  module
+version = 7.x-dev
+core = 7.x
+
+
+
