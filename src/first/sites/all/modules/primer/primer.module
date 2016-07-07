@@ -1,4 +1,5 @@
 <?php
+
 error_reporting(E_ALL);
 
 ini_set('display_errors', 1);
@@ -9,7 +10,7 @@ ini_set('display_errors', 1);
 function primer_menu(){
     $items = array();
    $items['primer'] = array(
-        'title'                 => 'CURRENCY',
+        'title'                 => 'primer',
         'page callback'         => 'my_first_primer',
         'access callback'       => TRUE
     );
@@ -19,11 +20,28 @@ function primer_menu(){
  * Implements my_first
  */
 
-function my_first_primer(){
-    $str="string for information";
-    $number=100;
-    $number=$number+100;
-    dsm($str);
+function my_first_primer()
+{
+    $path = drupal_get_path('module', 'primer');
+    $path_to_js = $path . '/js.js';
+    drupal_add_js($path_to_js);
+    $header = array();
+    $rows[] = array('data' => array(array('data' => '11', 'colspan' => 3, 'width' => 200)),'id'=>array('lyly1'),'data-toggle'=>array('popover'),
+                'title'=>array("Заголовок"),'data-content'=>array("здесь будет много текста"));
+    $rows[] = array('data' => array(array('data' => '21', 'colspan' => 3)),'id'=>array('lyly1'),'data-toggle'=>array('popover'),
+        'title'=>array("Заголовок"),'data-content'=>array("здесь будет много текста"));
+    $rows[] = array('data' => array(array('data' => '22', 'rowspan' => 5)),'id'=>array('lyly1'),'data-toggle'=>array('popover'),
+        'title'=>array("Заголовок"),'data-content'=>array("здесь будет много текста"));
+    $rows[] = array('2','3');
+    $rows[] = array('2','3');
+    $rows[] = array('2','3');
+    $rows[] = array('2','3');
+    $rows[] = array('data' => array(array('data' => '33', 'colspan' => 3, 'width' => 200)));
+    return theme('table', array('header' => $header, 'rows'=> $rows));
+
+
+
+
 
 }
 

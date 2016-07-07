@@ -1,0 +1,8 @@
+; &Id:$
+name = New Module
+description = this is new module
+version = 7.x-dev
+core = 7.x
+
+
+

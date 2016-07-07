@@ -1,0 +1,72 @@
+<?php
+//session_start();
+
+function mod_table_menu(){
+    $items = array();
+    $items['table'] = array(
+        'title'                 => 'table',
+        'page callback'         => 'function_mod_table',
+        'access callback'       => TRUE
+    );
+    return $items;
+}
+
+
+
+
+function function_mod_table()
+{
+    $path = drupal_get_path('module', 'mod_table');
+    $path_to_js = $path . '/js.js';
+    drupal_add_js($path_to_js);
+    $path_to_js = $path . '/jquery.sparkline.js';
+    drupal_add_js($path_to_js);
+    $num1=$_SESSION['data'];
+    $header = array(
+        array('data' => t('№')),
+        array('data' => t('Сurrency')),
+        array('data' => t("The course at the $num1"),'id'=>'time','data-time'=>$num1)
+    );
+    $time=strtotime($num1);
+    $i=0;
+    $nids = db_select('field_data_field_time2', 'n')
+        ->fields('n', array('entity_id'))
+        ->condition('n.field_time2_value', $time,'=')
+        ->execute()
+        ->fetchCol();
+    $nids_val = db_select('node', 'n')
+        ->fields('n', array('nid'))
+        ->condition('n.type', 'curse')
+        ->range(0,33)
+        ->execute()
+        ->fetchCol();
+    //print_r($nids);
+    //echo 'lylyl';
+    //echo $nids[0];
+    if($nids==null){
+        echo 'pisda';
+    } else{
+        foreach ($nids as $Valute){
+          //  $node_val= node_load($nids_val[$i]);
+            if($i<33) {
+                $node = $node = node_load($Valute);
+                $str = $node->field_time2[LANGUAGE_NONE][0]['value'];
+                $n = strpos($str, $num1);
+                //  drupal_set_message($num1,$str);
+                //if($num1==$str) {
+                $i = $i + 1;
+                // data-toggle="popover" title="Заголовок панели" data-content="Текст панели."
+                $name = $node->field__currency_name[LANGUAGE_NONE][0]['value'];
+                $val = $node->field_value[LANGUAGE_NONE][0]['value'];
+                $rows[] = array('data' => array(array('data' => $i), array('data' => $name),
+                    array('data' => $val)), 'id' => array($i)
+                );
+            }
+        }
+    }
+    #dsm($kurs);
+    return theme('table', array('header' => $header, 'rows'=> $rows));
+
+}
+
+?>

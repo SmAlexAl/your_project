@@ -1,0 +1,25 @@
+<?php
+header("Content-Type: text/html; charset=utf-8");
+
+/**
+ * Implements hook_menu
+ */
+function module_cur(){
+    $items = array();
+    $items['my-page'] = array(
+        'title'                 =>'cur',
+        'page callback'         => 'j',
+        'access callback'       => TRUE
+    );
+    return $items;
+}
+
+function j(){
+    $url='http://www.cbr.ru/scripts/XML_daily.asp';
+    $result = drupal_http_request($url);
+    $kurs= simplexml_load_string($result->data);
+    $json = json_encode($kurs);
+    print($json);
+
+}
+?>

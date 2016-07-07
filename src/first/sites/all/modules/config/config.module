@@ -1,0 +1,68 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: dns
+ * Date: 10.06.16
+ * Time: 21:15
+ */
+function config_menu() {
+    $items = array();
+
+    $items['foo/ajax'] = array(
+        'title' => t('foo AJAX'),
+        'type' => MENU_CALLBACK,
+        'page callback' => 'foo_ajax',
+        'access arguments' => array('access content'),
+    );
+    return $items;
+}
+
+function foo_ajax()
+{
+    $id = $_POST['param1'];
+    $param2 = $_POST['param2'];
+    $time=strtotime($param2);
+if($id) {
+    //$data=$id;
+    $nids_val = db_select('node', 'n')
+        ->fields('n', array('nid'))
+        ->condition('n.type', 'curse')
+        ->range(0, 33)
+        ->execute()
+        ->fetchCol();
+    $node = node_load($nids_val[$id - 1]);
+    $d=count($node->field_currency[LANGUAGE_NONE]);
+    $p=0;
+    $array_time=array();
+    $array_val=array();
+    for($i=0;$i<$d;$i++){
+        $node_kurs=node_load($node->field_currency[LANGUAGE_NONE][$i]['nid']);
+        if($time!=$node_kurs->field_time2[LANGUAGE_NONE][0]['value']){
+           // $array_time[$i]=array('time'=>date('Y-m-d',$node_kurs->field_time2[LANGUAGE_NONE][0]['value']),
+           //                       'val'=> $node_kurs->field_value[LANGUAGE_NONE][0]['value']);
+            $array_val[$i]=floatval(str_replace(',','.',$node_kurs->field_value[LANGUAGE_NONE][0]['value']));
+        }
+        else{
+            $p=$i;
+            break;
+        }
+    }
+    $rows = array(
+        'country' => $node->field_country[LANGUAGE_NONE][0]['value'],
+        'val' => $node->field_nominal[LANGUAGE_NONE][0]['value'],
+        'code' => $node->field_numcode[LANGUAGE_NONE][0]['value'],
+       /* 'data1' =>$array_time[$p-1]['time'],//переделать в массив
+        'val1'  =>$array_time[$p-1]['val'],
+        'data2' =>$array_time[$p-2]['time'],
+        'val2'  =>$array_time[$p-2]['val'],
+        'data3' =>$array_time[$p-3]['time'],
+        'val3'  =>$array_time[$p-3]['val']*/
+        'num'   =>$array_val
+    );
+    //$json = json_encode($rows);
+    //$data = array('one'=>'lylylylyl','two'=>'ylylyly');
+    drupal_json_output($rows);
+}
+   // return $data;
+}
+?>

@@ -16,10 +16,29 @@ function currency_json_menu(){
 }
 
 function json(){
-    $url='http://www.cbr.ru/scripts/XML_daily.asp';
-    $result = drupal_http_request($url);
-        $kurs= simplexml_load_string($result->data);
-        $json = json_encode($kurs);
+    $header = array(
+        array('number' => t('№')),
+        array('name' => t('Сurrency')),
+        array('dat' => t('The course at the moment'))
+    );
+    $nids = db_select('node', 'n')
+        ->fields('n', array('nid'))
+        ->condition('n.type', '_urrency')
+        ->execute()
+        ->fetchCol();
+    $i=0;
+    foreach ($nids as $n) {;
+        $i=$i+1;
+        $Valute=node_load($n);
+        $name = $Valute->field__currency_name['und'][0]['value'];
+        $val =$Valute->field_value['und'][0]['value'] ;
+        $rows[] = array(array('number' => $i),array('name' => $name),
+            array('value' => $val),
+        );
+
+    }
+       // print_r($rows);
+        $json = json_encode($rows);
            print($json);
    
 }

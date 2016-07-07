@@ -1,0 +1,181 @@
+<?php
+
+
+function new_mod_menu(){
+    $items = array();
+    $items['download'] = array(
+        'title'                 => 'download',
+        'page callback'         => 'new_mod_function',
+        'access callback'       => TRUE
+    );
+    return $items;
+}
+
+
+
+function new_mod_function()
+{
+    $ch = curl_init();
+
+// 2. указываем параметры, включая url
+    curl_setopt($ch, CURLOPT_URL, "http://www.cbr.ru/scripts/XML_daily.asp");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+
+// 3. получаем HTML в качестве результата
+    $output = curl_exec($ch);
+// 4. закрываем соединение
+    curl_close($ch);
+    $kurs = simplexml_load_string($output);
+
+
+    $i=0;
+
+    $today = date("Y-m-d");
+    $date_today=strtotime($today);
+    $date= date('Y-m-d', $date_today );
+    $nids_val = db_select('node', 'n')
+        ->fields('n', array('nid'))
+        ->condition('n.type', 'curse')
+        ->range(0, 33)
+        ->execute()
+        ->fetchCol();
+    foreach ($kurs->Valute as $Valute) {
+        $name = $Valute->Name;
+        $val = $Valute->Value;
+        $node = (object)array(
+            // Заголовок нод
+            'title' => "$name от $date",
+            // Содержимое ноды
+            'field__currency_name' => array(
+                LANGUAGE_NONE => array(
+                    0 => array(
+                        'value' => $name
+                    )
+                ),
+            ),
+            'field_value' => array(
+                LANGUAGE_NONE => array(
+                    0 => array(
+                        'value' => $val
+                    )
+                ),
+            ),
+            'field_time2' => array(
+                LANGUAGE_NONE => array(
+                    0 => array(
+                        'value' => $date_today
+                    )
+                ),
+            ),
+            // Тип материала, к которому относится нода
+            'type' => '_urrency',
+            'language' => LANGUAGE_NONE,
+            // uid пользователя, который создаёт ноду
+            'uid' => 1,
+        );
+        node_object_prepare($node);
+
+        if ($node = node_submit($node)) { // сохраняем
+            node_save($node);
+        }
+    }
+    $i=0;
+    foreach ($kurs->Valute as $Valute) {
+        $name = $Valute->Name;
+        $nids = db_select('node', 'n')
+            ->fields('n', array('nid'))
+            ->condition('n.type', '_urrency')
+            ->condition('n.title', "$name от $date",'=')
+            ->execute()
+            ->fetchCol();
+        $node_kurs=node_load($nids_val[$i]);
+        $d=count($node_kurs->field_currency[LANGUAGE_NONE]);
+        $node_kurs->field_currency[LANGUAGE_NONE][$d]['nid']=$nids[0];
+        node_save($node_kurs);
+        $i++;
+    }
+    return 0;
+}
+function new_mod_cron(){
+    $ch = curl_init();
+
+// 2. указываем параметры, включая url
+    curl_setopt($ch, CURLOPT_URL, "http://www.cbr.ru/scripts/XML_daily.asp");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+
+// 3. получаем HTML в качестве результата
+    $output = curl_exec($ch);
+// 4. закрываем соединение
+    curl_close($ch);
+    $kurs = simplexml_load_string($output);
+
+    $i=0;
+    $nids_val = db_select('node', 'n')
+        ->fields('n', array('nid'))
+        ->condition('n.type', 'curse')
+        ->range(0, 33)
+        ->execute()
+        ->fetchCol();
+    $today = date("Y-m-d");
+    $date_today=strtotime($today);
+    $date= date('Y-m-d', $date_today );
+    echo $date_today;
+    foreach ($kurs->Valute as $Valute) {
+        $name = $Valute->Name;
+        $val = $Valute->Value;
+        $node = (object)array(
+            // Заголовок нод
+            'title' => "$name от $date",
+            // Содержимое ноды
+            'field__currency_name' => array(
+                LANGUAGE_NONE => array(
+                    0 => array(
+                        'value' => $name
+                    )
+                ),
+            ),
+            'field_value' => array(
+                LANGUAGE_NONE => array(
+                    0 => array(
+                        'value' => $val
+                    )
+                ),
+            ),
+            'field_time2' => array(
+                LANGUAGE_NONE => array(
+                    0 => array(
+                        'value' => $date_today
+                    )
+                ),
+            ),
+            // Тип материала, к которому относится нода
+            'type' => '_urrency',
+            'language' => LANGUAGE_NONE,
+            // uid пользователя, который создаёт ноду
+            'uid' => 1,
+        );
+        node_object_prepare($node);
+
+        if ($node = node_submit($node)) { // сохраняем
+            node_save($node);
+        }
+    }
+    foreach ($kurs->Valute as $Valute) {
+        $name = $Valute->Name;
+        $nids = db_select('node', 'n')
+            ->fields('n', array('nid'))
+            ->condition('n.type', '_urrency')
+            ->condition('n.title', "$name от $date",'=')
+            ->execute()
+            ->fetchCol();
+        $node_kurs=node_load($nids_val[$i]);
+        $d=count($node_kurs->field_currency[LANGUAGE_NONE]);
+        $node_kurs->field_currency[LANGUAGE_NONE][$d]['nid']=$nids[0];
+        node_save($node_kurs);
+        $i++;
+    }
+}
+?>
+
